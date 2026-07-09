@@ -24,7 +24,7 @@ export interface AuthRouterDeps {
   readonly exchangeAuthorizationCode: (
     currentUrl: URL,
     checks: { pkceCodeVerifier: string; expectedState: string; expectedNonce: string },
-  ) => Promise<Record<string, unknown>>;
+  ) => Promise<{ claims: Record<string, unknown>; idToken: string }>;
   readonly sessionSeal: SessionSeal;
   readonly txSealKey: string;
   readonly roleMapConfig: RoleMapConfig;
@@ -33,7 +33,7 @@ export interface AuthRouterDeps {
   readonly sessionTtlSeconds: number;
   readonly redirectUri: string;
   readonly postLogoutRedirectUri?: string;
-  readonly endSession?: (params: { postLogoutRedirectUri: string }) => Promise<URL>;
+  readonly endSession?: (params: { postLogoutRedirectUri: string; idTokenHint?: string }) => Promise<URL>;
   readonly secureCookies: boolean;
   readonly now?: () => number;
 }
@@ -93,7 +93,7 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
     }
 
     try {
-      const claims = await deps.exchangeAuthorizationCode(currentUrlOf(req), {
+      const { claims, idToken } = await deps.exchangeAuthorizationCode(currentUrlOf(req), {
         pkceCodeVerifier: tx.codeVerifier,
         expectedState: tx.state,
         expectedNonce: tx.nonce,
@@ -130,6 +130,9 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
         ...(partnerId !== undefined ? { partnerId } : {}),
         ...(partnerSlug !== undefined ? { partnerSlug } : {}),
         ...(partnerKey !== undefined ? { partnerKey } : {}),
+        // Se retiene el `id_token` sellado para `id_token_hint` del logout (FR-014,
+        // Keycloak < 19). Cifrado y solo server-side — nunca cruza al cliente.
+        idToken,
         iat,
         exp: iat + deps.sessionTtlSeconds,
       });
@@ -196,6 +199,11 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
       return;
     }
 
+    // Desellar la sesión (si existe) para recuperar el `id_token` y pasarlo como
+    // `id_token_hint`: Keycloak < 19 lo exige para redirigir tras el logout.
+    const rawSession = cookies['bo_session'];
+    const session = rawSession ? deps.sessionSeal.unseal(rawSession) : null;
+
     res.setHeader('Set-Cookie', [
       expireCookie('bo_session', { secure: deps.secureCookies, sameSite: 'Strict' }),
       expireCookie('csrf', { secure: deps.secureCookies, sameSite: 'Strict' }),
@@ -207,7 +215,10 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
     // ya quedaron expiradas arriba (no se deja sesión operativa viva).
     if (deps.endSession && deps.postLogoutRedirectUri) {
       try {
-        const endSessionUrl = await deps.endSession({ postLogoutRedirectUri: deps.postLogoutRedirectUri });
+        const endSessionUrl = await deps.endSession({
+          postLogoutRedirectUri: deps.postLogoutRedirectUri,
+          ...(session?.idToken ? { idTokenHint: session.idToken } : {}),
+        });
         res.status(200).json({ ok: true, endSessionUrl: endSessionUrl.toString() });
         return;
       } catch {

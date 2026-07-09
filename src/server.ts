@@ -72,9 +72,12 @@ function createAuthRouterDeps(partnerRepository: AuthRouterDeps['partnerReposito
     get postLogoutRedirectUri() {
       return process.env['WEBVIEW_LOGIN_URL'];
     },
-    endSession: async ({ postLogoutRedirectUri }) => {
+    endSession: async ({ postLogoutRedirectUri, idTokenHint }) => {
       const config = await getOidcConfiguration(getEnvConfig());
-      return buildEndSessionUrl(config, { postLogoutRedirectUri });
+      return buildEndSessionUrl(config, {
+        postLogoutRedirectUri,
+        ...(idTokenHint !== undefined ? { idTokenHint } : {}),
+      });
     },
     secureCookies,
   };

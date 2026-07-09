@@ -35,16 +35,24 @@ export interface AuthorizationCodeGrantChecks {
   readonly expectedNonce: string;
 }
 
+export interface AuthorizationCodeResult {
+  /** Claims decodificados del ID Token (identidad, roles, partner). */
+  readonly claims: Record<string, unknown>;
+  /** `id_token` original (JWT firmado) — se retiene sellado para `id_token_hint` del logout. */
+  readonly idToken: string;
+}
+
 /**
  * Intercambia `code` por tokens y valida firma (JWKS)/`iss`/`aud`/`exp`/`nonce`
- * (D1, FR-003). Devuelve solo los claims del ID Token — el llamador descarta
- * el token tras derivar identidad/roles (FR-002).
+ * (D1, FR-003). Devuelve los claims del ID Token y el `id_token` crudo. El
+ * `access_token` se descarta (FR-002); el `id_token` se conserva sellado solo
+ * como `id_token_hint` del RP-initiated logout (Keycloak < 19).
  */
 export async function authorizationCodeGrant(
   config: client.Configuration,
   currentUrl: URL,
   checks: AuthorizationCodeGrantChecks,
-): Promise<Record<string, unknown>> {
+): Promise<AuthorizationCodeResult> {
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: checks.pkceCodeVerifier,
     expectedState: checks.expectedState,
@@ -53,10 +61,10 @@ export async function authorizationCodeGrant(
   });
 
   const claims = tokens.claims();
-  if (!claims) {
+  if (!claims || !tokens.id_token) {
     throw new Error('OIDC callback sin ID Token válido');
   }
-  return claims as Record<string, unknown>;
+  return { claims: claims as Record<string, unknown>, idToken: tokens.id_token };
 }
 
 export interface EndSessionParams {

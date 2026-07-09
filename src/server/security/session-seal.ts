@@ -6,9 +6,9 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 
 /**
- * Payload sellado en la cookie `bo_session` (AEAD, D2). NUNCA contiene el token
- * del IdP (FR-002). `partnerId`/`partnerSlug` son opcionales — presentes ⟺
- * sesión de asesor (007, D2); ausentes en sesiones de admin de Back Office.
+ * Payload sellado en la cookie `bo_session` (AEAD, D2). `partnerId`/`partnerSlug`
+ * son opcionales — presentes ⟺ sesión de asesor (007, D2); ausentes en sesiones
+ * de admin de Back Office. El `access_token` del IdP NUNCA se guarda (FR-002).
  */
 export interface SealedSession {
   readonly sub: string;
@@ -18,6 +18,14 @@ export interface SealedSession {
   readonly partnerSlug?: string;
   /** UUID del partner para consumir servicios externos (007/009). Presente ⟺ asesor. */
   readonly partnerKey?: string;
+  /**
+   * `id_token` original del IdP, retenido SOLO como `id_token_hint` del
+   * RP-initiated logout con Keycloak < 19 (que no acepta `client_id` como
+   * validador del `post_logout_redirect_uri`). Excepción consciente a FR-002:
+   * queda cifrado (AEAD) y JAMÁS se expone al cliente — no cruza a
+   * `AuthUser`/TransferState ni a `GET /api/admin/session`.
+   */
+  readonly idToken?: string;
   readonly iat: number; // epoch s
   readonly exp: number; // epoch s
 }

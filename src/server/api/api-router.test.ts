@@ -126,7 +126,7 @@ function fakeAuthRouterDeps(): AuthRouterDeps {
       state: 's',
       nonce: 'n',
     }),
-    exchangeAuthorizationCode: async () => ({ sub: 'u', name: 'U' }),
+    exchangeAuthorizationCode: async () => ({ claims: { sub: 'u', name: 'U' }, idToken: 'stub-id-token' }),
     sessionSeal: createSessionSeal({ key: Buffer.alloc(32).toString('base64') }),
     txSealKey: Buffer.alloc(32).toString('base64'),
     roleMapConfig: { roleClaimPath: 'roles', roleMap: {} },
