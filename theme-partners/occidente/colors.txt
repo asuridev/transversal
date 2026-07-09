@@ -1,0 +1,26 @@
+############################BANCO OCCIDENTE##########################################
+|colorPrimary        │ #0082CA │ Azul de marca Occidente (logo, día       │
+│                    │         │ seleccionado)                            │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorPrimaryTint   │ #B6ECFF │ Azul 300 (tinte claro)                   │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorSecondary     │ #021D3F │ Azul 900 (navy profundo)                 │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorSecondaryTint │ #EBEEFA │ Fondo del panel héroe (aprox — ver nota) │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorTextStrong    │ #313A43 │ Negro 800 (títulos/entradas)             │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorTextMuted     │ #808080 │ Gris 500 (labels, texto secundario)      │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorSurface       │ #FFFFFF │ Blanco (tarjeta del formulario)          │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorBorder        │ #CCCCCC │ Gris 300 (bordes de inputs)              │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorHeroSurface   │ #EBEEFA │ Panel lavanda "Conoce a tu cliente"      │
+│                    │         │ (aprox)                                  │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorHeroText      │ #021D3F │ Título del héroe (navy)                  │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorFooterSurface │ #FFFFFF │ Footer claro                             │
+├────────────────────┼─────────┼──────────────────────────────────────────┤
+│ colorFooterText    │ #808080 │ Texto/sellos del footer
