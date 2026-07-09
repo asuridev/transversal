@@ -174,13 +174,16 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
       return;
     }
 
+    // Solo se expone `partnerSlug` al cliente (lo consume el guard de
+    // aislamiento e `isAsesor`). `partnerId` y `partnerKey` permanecen
+    // exclusivamente server-side (sellados en `bo_session`): el `partnerKey` es
+    // un secreto y el `partnerId` no tiene consumidor en el cliente — ambos son
+    // resolubles del lado del servidor a partir del `partnerSlug`/la sesión.
     res.status(200).json({
       subject: session.sub,
       name: session.name,
       roles: session.roles,
-      ...(session.partnerId !== undefined ? { partnerId: session.partnerId } : {}),
       ...(session.partnerSlug !== undefined ? { partnerSlug: session.partnerSlug } : {}),
-      ...(session.partnerKey !== undefined ? { partnerKey: session.partnerKey } : {}),
     });
   });
 

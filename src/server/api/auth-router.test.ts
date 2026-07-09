@@ -190,9 +190,11 @@ test('auth-router', async (t) => {
         });
         assert.equal(sessionRes.status, 200);
         const body = (await sessionRes.json()) as { partnerId?: string; partnerSlug?: string; partnerKey?: string };
-        assert.equal(body.partnerId, 'p-abc');
+        // Solo `partnerSlug` cruza al cliente; `partnerId`/`partnerKey` quedan
+        // sellados server-side y NO se exponen en la respuesta whoami.
         assert.equal(body.partnerSlug, 'banco-a');
-        assert.equal(body.partnerKey, '2efd0584-d38a-4a2f-9dd8-42f2905c3aae');
+        assert.equal(body.partnerId, undefined);
+        assert.equal(body.partnerKey, undefined);
       },
     );
   });

@@ -37,32 +37,28 @@ describe('AuthStore', () => {
     expect(store.hasAnyRole('auditor')).toBe(false);
   });
 
-  it('partnerId/partnerSlug/isAsesor: null/false sin usuario', () => {
+  it('partnerSlug/isAsesor: null/false sin usuario', () => {
     const store = TestBed.inject(AuthStore);
-    expect(store.partnerId()).toBeNull();
     expect(store.partnerSlug()).toBeNull();
     expect(store.isAsesor()).toBe(false);
   });
 
-  it('partnerId/partnerSlug/isAsesor: presentes tras setUser con partner (007, D7)', () => {
+  it('partnerSlug/isAsesor: presentes tras setUser con partner (007, D7)', () => {
     const store = TestBed.inject(AuthStore);
     const user: AuthUser = {
       subject: 'u-asesor-a',
       name: 'Asesor A',
       roles: [],
-      partnerId: 'p-abc',
       partnerSlug: 'banco-a',
     };
     store.setUser(user);
-    expect(store.partnerId()).toBe('p-abc');
     expect(store.partnerSlug()).toBe('banco-a');
     expect(store.isAsesor()).toBe(true);
   });
 
-  it('partnerId/partnerSlug/isAsesor: null/false para usuario admin sin partner', () => {
+  it('partnerSlug/isAsesor: null/false para usuario admin sin partner', () => {
     const store = TestBed.inject(AuthStore);
     store.setUser({ subject: 'u-1', name: 'Ana', roles: ['platform-admin'] });
-    expect(store.partnerId()).toBeNull();
     expect(store.partnerSlug()).toBeNull();
     expect(store.isAsesor()).toBe(false);
   });

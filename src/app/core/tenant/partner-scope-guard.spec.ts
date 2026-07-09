@@ -36,7 +36,7 @@ describe('partnerScopeMatch', () => {
   it('true cuando el partner de la sesión coincide con el tenant resuelto', () => {
     const authStore = TestBed.inject(AuthStore);
     const tenantStore = TestBed.inject(TenantStore);
-    authStore.setUser({ subject: 'u-a', name: 'Asesor A', roles: [], partnerId: 'p-a', partnerSlug: 'banco-a' });
+    authStore.setUser({ subject: 'u-a', name: 'Asesor A', roles: [], partnerSlug: 'banco-a' });
     tenantStore.setResolution({ kind: 'partner', slug: 'banco-a' });
 
     const result = TestBed.runInInjectionContext(() => partnerScopeMatch({} as never, []));
@@ -47,7 +47,7 @@ describe('partnerScopeMatch', () => {
   it('redirige (UrlTree) al partner propio cuando el tenant resuelto es distinto (007, D6)', () => {
     const authStore = TestBed.inject(AuthStore);
     const tenantStore = TestBed.inject(TenantStore);
-    authStore.setUser({ subject: 'u-a', name: 'Asesor A', roles: [], partnerId: 'p-a', partnerSlug: 'banco-a' });
+    authStore.setUser({ subject: 'u-a', name: 'Asesor A', roles: [], partnerSlug: 'banco-a' });
     tenantStore.setResolution({ kind: 'partner', slug: 'banco-b' });
     const urlTree = {} as UrlTree;
     parseUrl.and.returnValue(urlTree);

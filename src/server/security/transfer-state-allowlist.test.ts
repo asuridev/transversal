@@ -40,13 +40,12 @@ test('transfer-state-allowlist', async (t) => {
     );
   });
 
-  await t.test('P6: acepta "session" con partnerId/partnerSlug (asesor)', () => {
+  await t.test('P6: acepta "session" con partnerSlug (asesor)', () => {
     assert.doesNotThrow(() =>
       assertAllowedTransferStateWrite('session', {
         subject: 'u-a',
         name: 'Asesor A',
         roles: [],
-        partnerId: 'p-a',
         partnerSlug: 'banco-a',
       }),
     );
@@ -58,9 +57,20 @@ test('transfer-state-allowlist', async (t) => {
         subject: 'u-a',
         name: 'Asesor A',
         roles: [],
-        partnerId: 'p-a',
         partnerSlug: 'banco-a',
         partnerKey: '2efd0584-d38a-4a2f-9dd8-42f2905c3aae',
+      }),
+    );
+  });
+
+  await t.test('P6c: rechaza "session" con partnerId (sin consumidor en el cliente; se resuelve server-side)', () => {
+    assert.throws(() =>
+      assertAllowedTransferStateWrite('session', {
+        subject: 'u-a',
+        name: 'Asesor A',
+        roles: [],
+        partnerId: 'p-a',
+        partnerSlug: 'banco-a',
       }),
     );
   });

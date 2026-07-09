@@ -5,6 +5,5 @@ export interface AuthUser {
   readonly name: string;
   readonly roles: readonly AppRole[];
   /** Presente ⟺ el usuario es un asesor vinculado a un único partner (007, D7). */
-  readonly partnerId?: string;
   readonly partnerSlug?: string;
 }

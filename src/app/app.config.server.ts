@@ -64,7 +64,6 @@ const serverConfig: ApplicationConfig = {
               subject: sealed.sub,
               name: sealed.name,
               roles: sealed.roles,
-              ...(sealed.partnerId !== undefined ? { partnerId: sealed.partnerId } : {}),
               ...(sealed.partnerSlug !== undefined ? { partnerSlug: sealed.partnerSlug } : {}),
             };
             authStore.setUser(user);

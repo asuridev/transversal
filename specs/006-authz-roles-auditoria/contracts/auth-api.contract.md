@@ -49,7 +49,10 @@ Estado de sesión para el bootstrap del front (D10).
   ```json
   { "subject": "u-123", "name": "Ana Pérez", "roles": ["partner-editor"] }
   ```
-  El token del IdP **no** aparece (SC-002).
+  El token del IdP **no** aparece (SC-002). En sesiones de asesor se añade
+  `partnerSlug` (007). **`partnerId` y `partnerKey` NO se exponen** (009): el
+  `partnerKey` es un secreto y el `partnerId` no tiene consumidor en el front;
+  ambos permanecen sellados en `bo_session` y se resuelven server-side.
 - Sin sesión / expirada / inválida ⇒ `401` (`createApiError('unauthorized', …)`).
   El front reacciona iniciando `GET /api/auth/login` (US1 esc.4, SC-004).
 

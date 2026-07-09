@@ -18,12 +18,13 @@ Cumple Const. I–IV.
 // auth-model.ts
 interface AuthUser {
   subject: string; name: string; roles: readonly AppRole[];
-  partnerId?: string;    // NUEVO — presente ⟺ asesor
-  partnerSlug?: string;  // NUEVO
+  partnerSlug?: string;  // presente ⟺ asesor
 }
+// `partnerId`/`partnerKey` NO cruzan al cliente (009): el `partnerKey` es un
+// secreto y el `partnerId` no tiene consumidor en el front; ambos se resuelven
+// server-side desde la sesión sellada / el `partnerSlug`.
 
 // auth.store.ts — computed síncronos (Const. §2)
-partnerId   = computed(() => this.user()?.partnerId   ?? null);
 partnerSlug = computed(() => this.user()?.partnerSlug ?? null);
 isAsesor    = computed(() => this.partnerSlug() !== null);
 ```
@@ -42,7 +43,7 @@ isAsesor    = computed(() => this.partnerSlug() !== null);
 ```ts
 interface SessionDto {
   subject: string; name: string; roles: AppRole[];
-  partnerId?: string; partnerSlug?: string;   // NUEVO
+  partnerSlug?: string;   // presente ⟺ asesor; `partnerId`/`partnerKey` no se exponen (009)
 }
 ```
 
