@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
 
 import { createApiRouter } from './server/api/api-router.ts';
 import type { AuthRouterDeps } from './server/api/auth-router.ts';
@@ -81,6 +82,20 @@ function createAuthRouterDeps(partnerRepository: AuthRouterDeps['partnerReposito
     },
     secureCookies,
   };
+}
+
+/**
+ * Enruta las llamadas salientes del BFF (fetch nativo de Node/undici, usado por
+ * los clientes externos de Cardif/Mashery y por `openid-client`) a través del
+ * proxy corporativo. El `fetch` de Node NO honra `HTTP_PROXY`/`HTTPS_PROXY` por
+ * sí solo: hay que instalar un dispatcher. `EnvHttpProxyAgent` lee esas vars y
+ * `NO_PROXY` del entorno, de modo que en desarrollo solo las peticiones a hosts
+ * externos (no locales) pasan por el proxy; el tráfico local (IdP OIDC en :8080,
+ * webview-login en :4300) queda excluido vía `NO_PROXY=localhost,127.0.0.1`.
+ * Solo se activa si hay proxy configurado, así que en producción no cambia nada.
+ */
+if (process.env['HTTPS_PROXY'] || process.env['HTTP_PROXY']) {
+  setGlobalDispatcher(new EnvHttpProxyAgent());
 }
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
