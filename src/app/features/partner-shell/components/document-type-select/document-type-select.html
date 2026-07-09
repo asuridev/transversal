@@ -1,0 +1,72 @@
+<!-- Backdrop invisible: cierra al hacer click afuera sin @HostListener (zoneless) -->
+@if (isOpen()) {
+  <button
+    type="button"
+    tabindex="-1"
+    aria-hidden="true"
+    class="fixed inset-0 z-10 cursor-default"
+    (click)="close()"
+  ></button>
+}
+
+<!-- Trigger: réplica del input Figma (56px, borde text-muted, radio 4, texto 16px) -->
+<button
+  type="button"
+  [disabled]="disabled()"
+  [attr.aria-expanded]="isOpen()"
+  aria-haspopup="listbox"
+  aria-controls="document-type-listbox"
+  class="relative flex h-14 w-full items-center justify-between gap-2 rounded-[4px] border border-text-muted bg-transparent px-4 text-left focus:outline-none disabled:cursor-not-allowed"
+  [class.z-20]="isOpen()"
+  (click)="onClick($event)"
+  (keydown)="onTriggerKeydown($event)"
+>
+  <!-- Label flotante: placeholder centrado en reposo; sube a 12px al enfocar/tener valor -->
+  <span
+    class="pointer-events-none absolute left-4 origin-left text-text-muted transition-all duration-200 ease-out"
+    [class]="{
+      'top-1/2': !floated(),
+      '-translate-y-1/2': !floated(),
+      'text-base': !floated(),
+      'top-2': floated(),
+      'text-xs': floated(),
+      'leading-5': floated()
+    }"
+    >{{ placeholder() }}</span
+  >
+  <!-- Valor seleccionado (16px, text-strong), debajo del label flotado -->
+  @if (hasValue()) {
+    <span class="truncate pt-[18px] text-base text-text-strong">{{ displayLabel() }}</span>
+  }
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    class="ml-auto h-4 w-4 shrink-0 text-text-muted transition-transform"
+    [class.rotate-180]="isOpen()"
+    aria-hidden="true"
+  >
+    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</button>
+
+<!-- Panel: dropdown estilizado Figma (mismo render en desktop/tablet/mobile) -->
+@if (isOpen()) {
+  <ul
+    id="document-type-listbox"
+    role="listbox"
+    class="absolute left-0 right-0 top-full z-20 mt-px max-h-[280px] overflow-y-auto rounded-b-[12px] border border-text-muted bg-surface"
+  >
+    @for (option of options(); track option; let i = $index) {
+      <li
+        role="option"
+        [attr.aria-selected]="option === value()"
+        class="flex cursor-pointer items-center border-b border-border p-4 text-base text-text-strong last:border-b-0"
+        [class.bg-primary-tint]="i === highlightedIndex() || option === value()"
+        (click)="select(option)"
+        (mouseenter)="highlightedIndex.set(i)"
+      >
+        {{ option }}
+      </li>
+    }
+  </ul>
+}

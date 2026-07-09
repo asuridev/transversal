@@ -1,0 +1,191 @@
+{
+  "realm": "backoffice",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "platform-admin", "description": "Administrador de plataforma" },
+      { "name": "partner-editor", "description": "Editor de partners/branding" },
+      { "name": "auditor", "description": "Solo lectura de partners y auditoría" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "backoffice-bff",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "backoffice-bff-dev-secret",
+      "redirectUris": [
+        "http://localhost:4000/api/auth/callback",
+        "http://localhost:4300",
+        "http://localhost:4300/*"
+      ],
+      "webOrigins": ["http://localhost:4000"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "partner-claim",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "partner",
+            "multivalued": "false",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "partner",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "webview-login",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:4300/*"],
+      "webOrigins": ["http://localhost:4300"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "partner-claim",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "partner",
+            "multivalued": "false",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "partner",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "email": "admin-user@backoffice.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [{ "type": "password", "value": "admin-user", "temporary": false }],
+      "realmRoles": ["platform-admin"]
+    },
+    {
+      "username": "editor-user",
+      "enabled": true,
+      "email": "editor-user@backoffice.local",
+      "firstName": "Editor",
+      "lastName": "User",
+      "credentials": [{ "type": "password", "value": "editor-user", "temporary": false }],
+      "realmRoles": ["partner-editor"]
+    },
+    {
+      "username": "auditor-user",
+      "enabled": true,
+      "email": "auditor-user@backoffice.local",
+      "firstName": "Auditor",
+      "lastName": "User",
+      "credentials": [{ "type": "password", "value": "auditor-user", "temporary": false }],
+      "realmRoles": ["auditor"]
+    },
+    {
+      "username": "norole-user",
+      "enabled": true,
+      "email": "norole-user@backoffice.local",
+      "firstName": "Norole",
+      "lastName": "User",
+      "credentials": [{ "type": "password", "value": "norole-user", "temporary": false }],
+      "realmRoles": []
+    },
+    {
+      "username": "occidente",
+      "enabled": true,
+      "email": "asesor-a@occidente.local",
+      "firstName": "Asesor",
+      "lastName": "Banco A",
+      "credentials": [{ "type": "password", "value": "occidente", "temporary": false }],
+      "realmRoles": [],
+      "attributes": { "partner": ["banco-occidente"] }
+    },
+    {
+      "username": "asesor-a",
+      "enabled": true,
+      "email": "asesor-a@backoffice.local",
+      "firstName": "Asesor",
+      "lastName": "Banco A",
+      "credentials": [{ "type": "password", "value": "asesor-a", "temporary": false }],
+      "realmRoles": [],
+      "attributes": { "partner": ["banco-a"] }
+    },
+    {
+      "username": "asesor-b",
+      "enabled": true,
+      "email": "asesor-b@backoffice.local",
+      "firstName": "Asesor",
+      "lastName": "Banco B",
+      "credentials": [{ "type": "password", "value": "asesor-b", "temporary": false }],
+      "realmRoles": [],
+      "attributes": { "partner": ["banco-b"] }
+    },
+    {
+      "username": "asesor-inactivo",
+      "enabled": true,
+      "email": "asesor-inactivo@backoffice.local",
+      "firstName": "Asesor",
+      "lastName": "Partner Inactivo",
+      "credentials": [{ "type": "password", "value": "asesor-inactivo", "temporary": false }],
+      "realmRoles": [],
+      "attributes": { "partner": ["banco-inactivo"] }
+    }
+  ]
+}

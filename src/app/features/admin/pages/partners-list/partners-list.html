@@ -1,0 +1,143 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold">Partners</h1>
+      <p class="text-sm text-admin-text-muted">
+        {{ partnersQuery.data()?.length ?? 0 }} partner(s) registrados
+      </p>
+    </div>
+    <ui-link-button routerLink="/admin/nuevo">
+      <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      Nuevo partner
+    </ui-link-button>
+  </div>
+
+  <label class="flex flex-col gap-1 text-sm text-admin-text-muted">
+    <span class="sr-only">Buscar partners por nombre o slug</span>
+    <div class="flex max-w-sm items-center gap-2">
+      <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4 shrink-0 text-admin-text-soft" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+        <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+      <ui-text-input placeholder="Buscar por nombre o slug…" class="flex-1" (valueChange)="onSearchInput($event)" />
+    </div>
+  </label>
+
+  @if (partnersQuery.isPending()) {
+    <ui-card class="p-4">
+      <div class="flex flex-col gap-3" aria-hidden="true">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="flex animate-pulse items-center gap-4 py-2">
+            <div class="h-3 w-32 rounded bg-admin-border/60"></div>
+            <div class="h-3 w-20 rounded bg-admin-border/60"></div>
+            <div class="h-5 w-16 rounded-full bg-admin-border/60"></div>
+            <div class="ml-auto h-8 w-24 rounded bg-admin-border/60"></div>
+          </div>
+        }
+      </div>
+      <span class="sr-only">Cargando partners…</span>
+    </ui-card>
+  } @else if (partnersQuery.isError()) {
+    <ui-card class="flex flex-col items-center gap-3 p-8 text-center">
+      <svg viewBox="0 0 24 24" fill="none" class="h-8 w-8 text-red-600" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+        <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+      <p class="text-red-600">No se pudo cargar el listado. Intenta de nuevo.</p>
+      <ui-button variant="admin-secondary" type="button" (click)="retry()">Reintentar</ui-button>
+    </ui-card>
+  } @else if (filteredPartners().length === 0) {
+    <ui-card class="flex flex-col items-center gap-2 p-8 text-center text-admin-text-muted">
+      <svg viewBox="0 0 24 24" fill="none" class="h-8 w-8 text-admin-text-soft" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" />
+        <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <p>No hay coincidencias para tu búsqueda.</p>
+    </ui-card>
+  } @else {
+    <!-- Tabla — md y superiores -->
+    <ui-card class="hidden md:block">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-admin-border text-admin-text-muted">
+            <tr>
+              <th scope="col" class="px-4 py-3">Nombre</th>
+              <th scope="col" class="px-4 py-3">Slug</th>
+              <th scope="col" class="px-4 py-3">Estado</th>
+              <th scope="col" class="px-4 py-3">Versión</th>
+              <th scope="col" class="px-4 py-3">Actualizado</th>
+              <th scope="col" class="px-4 py-3">Por</th>
+              <th scope="col" class="px-4 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (partner of filteredPartners(); track partner.id) {
+              <tr class="border-b border-admin-border last:border-0 hover:bg-admin-bg/60">
+                <td class="px-4 py-3 font-medium">{{ partner.displayName }}</td>
+                <td class="px-4 py-3 text-admin-text-muted">{{ partner.slug }}</td>
+                <td class="px-4 py-3">
+                  <ui-badge [variant]="partner.status === 'active' ? 'active' : 'inactive'">
+                    {{ partner.status === 'active' ? 'Activo' : 'Inactivo' }}
+                  </ui-badge>
+                </td>
+                <td class="px-4 py-3">{{ partner.currentVersion ?? 'Borrador' }}</td>
+                <td class="px-4 py-3">{{ partner.updatedAt }}</td>
+                <td class="px-4 py-3">{{ partner.updatedBy }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex gap-1">
+                    <ui-link-button variant="admin-secondary" size="sm" [routerLink]="['/admin', partner.id, 'editar']">
+                      <svg viewBox="0 0 24 24" fill="none" class="h-3.5 w-3.5" aria-hidden="true">
+                        <path d="M4 20h4l10-10-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                      </svg>
+                      Editar
+                      <span class="sr-only"> {{ partner.displayName }}</span>
+                    </ui-link-button>
+                    <ui-button variant="ghost" size="sm" type="button" (click)="toggleStatus(partner)">
+                      <svg viewBox="0 0 24 24" fill="none" class="h-3.5 w-3.5" aria-hidden="true">
+                        <path d="M12 3v8M6.5 6.5a7 7 0 1 0 11 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                      </svg>
+                      {{ partner.status === 'active' ? 'Desactivar' : 'Activar' }}
+                      <span class="sr-only"> {{ partner.displayName }}</span>
+                    </ui-button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </ui-card>
+
+    <!-- Tarjetas — bajo md -->
+    <div class="flex flex-col gap-3 md:hidden">
+      @for (partner of filteredPartners(); track partner.id) {
+        <ui-card class="flex flex-col gap-3 p-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="font-medium">{{ partner.displayName }}</p>
+              <p class="text-sm text-admin-text-muted">{{ partner.slug }}</p>
+            </div>
+            <ui-badge [variant]="partner.status === 'active' ? 'active' : 'inactive'">
+              {{ partner.status === 'active' ? 'Activo' : 'Inactivo' }}
+            </ui-badge>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-admin-text-muted">
+            <span>Versión: {{ partner.currentVersion ?? 'Borrador' }}</span>
+            <span>Actualizado: {{ partner.updatedAt }}</span>
+            <span>Por: {{ partner.updatedBy }}</span>
+          </div>
+          <div class="flex gap-2 border-t border-admin-border pt-3">
+            <ui-link-button variant="admin-secondary" size="sm" [routerLink]="['/admin', partner.id, 'editar']" class="flex-1">
+              Editar
+            </ui-link-button>
+            <ui-button variant="ghost" size="sm" type="button" class="flex-1" (click)="toggleStatus(partner)">
+              {{ partner.status === 'active' ? 'Desactivar' : 'Activar' }}
+            </ui-button>
+          </div>
+        </ui-card>
+      }
+    </div>
+  }
+</div>

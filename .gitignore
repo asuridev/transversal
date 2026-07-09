@@ -1,0 +1,59 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+.claude/
+.agents/
+.angular/cache
+.playwright
+.playwright-cli
+.playwright-mcp
+.specify
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# SQLite runtime files (persistence-config.ts, PARTNERS_DB_PATH default 'partners.db')
+partners.db
+partners.db-shm
+partners.db-wal
+partners.db-journal
+
+# Assets de marca subidos (asset-storage.ts driver 'local', ASSETS_DIR default './data/assets')
+/data/assets/

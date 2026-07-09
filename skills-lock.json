@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "angular-best-practices-signalstore": {
+      "source": "alfredoperez/angular-best-practices",
+      "sourceType": "github",
+      "skillPath": "skills/angular-best-practices-signalstore/SKILL.md",
+      "computedHash": "34ccdfc82937be2ca4429ef265954bc17d09507232b451d8143d72a94f0cf44d"
+    },
+    "angular-best-practices-tanstack": {
+      "source": "alfredoperez/angular-best-practices",
+      "sourceType": "github",
+      "skillPath": "skills/angular-best-practices-tanstack/SKILL.md",
+      "computedHash": "707c710081cc09bf1eb7282ed425f3eb43bd36da491ce083003bb2cc66e74a80"
+    },
+    "angular-developer": {
+      "source": "angular/skills",
+      "sourceType": "github",
+      "skillPath": "angular-developer/SKILL.md",
+      "computedHash": "3a7b43eaececd29b02fd097a8b77931ef411b328a6353252f81b2ecfecc183a8"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "90739ddf380aa66d4fff7ba7767a0a6537a1e8287e5c5c408676e0a9e6b2c21d"
+    }
+  }
+}

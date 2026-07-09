@@ -1,0 +1,47 @@
+<div class="flex flex-col gap-6">
+  <p class="text-base text-text-strong">Selecciona el correo electrónico y número de contacto vigentes.</p>
+
+  <!-- Correo electrónico -->
+  <div class="flex flex-col gap-2">
+    <p class="text-base font-bold text-text-strong">Correo electrónico</p>
+    @for (item of emails(); track $index) {
+      <label class="flex items-center gap-3 border-b border-text-muted py-2 text-sm text-text-strong">
+        <span class="flex-1">{{ item.email }}</span>
+        <input
+          type="radio"
+          name="confirm-email"
+          [checked]="selectedEmailIndex() === $index"
+          (change)="selectedEmailIndex.set($index)"
+          class="h-5 w-5 shrink-0 appearance-none rounded-full border border-text-muted bg-white checked:border-[5px] checked:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        />
+      </label>
+    }
+  </div>
+
+  <!-- Número de contacto -->
+  <div class="flex flex-col gap-2">
+    <p class="text-base font-bold text-text-strong">Número de contacto</p>
+    @for (item of phones(); track $index) {
+      <label class="flex items-center gap-3 border-b border-text-muted py-2 text-sm text-text-strong">
+        <span class="flex-1">{{ item.cellPhoneNumber }}</span>
+        <input
+          type="radio"
+          name="confirm-phone"
+          [checked]="selectedPhoneIndex() === $index"
+          (change)="selectedPhoneIndex.set($index)"
+          class="h-5 w-5 shrink-0 appearance-none rounded-full border border-text-muted bg-white checked:border-[5px] checked:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        />
+      </label>
+    }
+  </div>
+
+  <!-- Continuar: pill radio 29.5, Poppins Bold 18, verde de marca; gris deshabilitado hasta elegir ambos -->
+  <button
+    type="button"
+    [disabled]="!canContinue()"
+    (click)="onContinue()"
+    class="self-center rounded-[29.5px] bg-primary px-12 py-3 text-lg font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-[#cccccc]"
+  >
+    Continuar
+  </button>
+</div>

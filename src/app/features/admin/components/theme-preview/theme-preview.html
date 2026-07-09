@@ -1,0 +1,23 @@
+<ui-card class="overflow-hidden p-0">
+  <div class="flex items-center justify-between border-b border-admin-border bg-admin-bg px-4 py-2">
+    <span class="text-xs font-semibold uppercase tracking-wide text-admin-text-muted">Vista previa en vivo</span>
+    <span class="rounded-full bg-admin-text-soft/20 px-2 py-0.5 text-xs text-admin-text-muted">Sin publicar cambios</span>
+  </div>
+
+  <div
+    class="flex flex-col gap-6 p-6 font-[var(--brand-font-family)]"
+    style="background-color: var(--brand-surface); color: var(--brand-text-strong); border-top: 1px solid var(--brand-border);"
+  >
+    <header class="flex items-center justify-between">
+      <app-brand-logo [themeOverride]="previewTheme()" />
+    </header>
+
+    <div class="flex flex-col gap-4 rounded-[5px] p-6" style="background-color: var(--brand-primary-tint);">
+      <h2 class="text-xl font-bold">Personaliza tu seguro</h2>
+      <p style="color: var(--brand-text-muted);">Ofrecimiento del seguro — vista previa de marca.</p>
+      <ui-button variant="brand-primary">Continuar</ui-button>
+    </div>
+
+    <app-brand-footer [themeOverride]="previewTheme()" />
+  </div>
+</ui-card>

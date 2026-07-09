@@ -1,0 +1,103 @@
+<app-kyc-card [heroImageUrl]="heroImageUrl()" (back)="onBack()">
+  @if (step() === 'confirm' && contactInfo.data(); as result) {
+    <!-- Paso de confirmación: listas de contacto vigentes con la data recibida -->
+    <app-contact-confirm
+      [info]="result.bodyResponse.personalInformation"
+      (continued)="onContinue($event)"
+    />
+  } @else {
+    <!-- Formulario KYC: campos y textos compartidos por todos los partners -->
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col justify-center gap-6 bg-surface pb-6 md:flex-1 md:py-6 md:pl-[32px] md:pr-[24px] lg:w-[440px] lg:flex-none lg:shrink-0"
+    >
+      <div class="flex flex-col gap-8">
+        <div class="flex flex-col gap-4">
+          <!-- Inputs: 56px alto, borde parametrizado (text-muted), radio 4, texto 16px -->
+          <!-- Tipo de documento: dropdown custom (diseño Figma, coherente en tablet/mobile) -->
+          <app-document-type-select
+            formControlName="tipoDocumento"
+            [options]="documentTypes"
+            placeholder="Tipo de documento"
+          />
+
+          <!-- Número de documento: label flotante (Material/Google) 100% CSS con `peer` -->
+          <div class="relative h-14 rounded-[4px] border border-text-muted">
+            <input
+              id="numeroDocumento"
+              formControlName="numeroDocumento"
+              type="text"
+              inputmode="numeric"
+              placeholder=" "
+              class="peer h-full w-full bg-transparent px-4 pt-4 text-base text-text-strong focus:outline-none"
+            />
+            <label
+              for="numeroDocumento"
+              class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-text-muted transition-all duration-200 ease-out peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:leading-5 peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:leading-5"
+            >
+              Número de documento
+            </label>
+          </div>
+
+          <!-- Fecha de expedición: calendario custom (diseño Figma, coherente en tablet/mobile) -->
+          <app-date-field
+            formControlName="fechaExpedicion"
+            placeholder="Fecha de expedición del documento"
+          />
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <!-- Autorizaciones: card borde parametrizado (primary-tint) radio 8, checkbox 24px, texto 12px #313a43 -->
+          <label class="flex items-center gap-4 rounded-[8px] border border-primary-tint p-4 text-xs leading-5 text-[#313a43]">
+            <input
+              formControlName="consentAsesor"
+              type="checkbox"
+              class="h-6 w-6 shrink-0 appearance-none rounded-[6px] border border-[#b3b3b3] bg-white bg-center bg-no-repeat checked:border-primary checked:bg-primary checked:bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M6%2012l4%204%208-8%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            />
+            <span>
+              Autorizo al asesor designado por {{ partnerName() }} a actuar en mi representación para
+              efectos de consulta, validación y registro de mi información en este proceso, conforme a la
+              <span class="underline">política de tratamiento de datos personales vigente</span>.
+            </span>
+          </label>
+
+          <label class="flex items-center gap-4 rounded-[8px] border border-primary-tint p-4 text-xs leading-5 text-[#313a43]">
+            <input
+              formControlName="consentDatos"
+              type="checkbox"
+              class="h-6 w-6 shrink-0 appearance-none rounded-[6px] border border-[#b3b3b3] bg-white bg-center bg-no-repeat checked:border-primary checked:bg-primary checked:bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M6%2012l4%204%208-8%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            />
+            <span>
+              Autorizas a {{ partnerName() }} y a Seguros Alfa S.A. para realizar el tratamiento de tus
+              datos personales con fines contractuales, comerciales, publicitarios, promocionales, y de
+              mejoramiento del servicio o producto financiero contratado. Asimismo, autorizas la
+              transmisión y/o transferencia de tu información personal a terceros aliados de estas
+              entidades, para los objetivos antes mencionados.
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Error de la consulta -->
+      @if (contactInfo.isError()) {
+        <p class="text-center text-sm text-red-600" role="alert">
+          No fue posible consultar la información. Intenta nuevamente.
+        </p>
+      }
+
+      <!-- Consultar: pill radio 29.5, Poppins Bold 18, verde de marca; gris deshabilitado (form inválido / cargando) -->
+      <button
+        type="submit"
+        [disabled]="form.invalid || contactInfo.isFetching()"
+        class="self-center rounded-[29.5px] bg-primary px-12 py-3 text-lg font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-[#cccccc]"
+      >
+        {{ contactInfo.isFetching() ? 'Consultando…' : 'Consultar' }}
+      </button>
+    </form>
+  }
+
+  @if (contactInfo.isLoading()) {
+    <ui-loading-overlay />
+  }
+</app-kyc-card>

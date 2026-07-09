@@ -1,0 +1,39 @@
+<section class="mx-auto flex w-full max-w-[862px] flex-col items-stretch gap-6 px-4 py-2 md:px-12 lg:px-4">
+  <!-- Volver: flecha 16px + texto Poppins 16px gris #b3b3b3 (Figma) -->
+  <button type="button" (click)="back.emit()" class="flex items-center gap-2 self-start text-base text-[#b3b3b3]">
+    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+      <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    Volver
+  </button>
+
+  <!-- Card validación de datos (Figma): mobile = banner + contenido apilados con gap-32, sin borde;
+       desde tablet (md) = card con radio 24 y borde 3px parametrizado (marca), dos columnas
+       flush 338/384 (héroe) + resto (contenido del paso). -->
+  <div
+    class="flex w-full flex-col gap-8 md:flex-row md:items-stretch md:gap-0 md:overflow-hidden md:rounded-[24px] md:border-[3px] md:border-hero-surface"
+  >
+    <!-- Panel héroe: fondo/texto parametrizados por partner (--brand-hero-*).
+         Mobile: banner propio (radio 24) de 93px, título centrado 24px, sin imagen (Figma mobile).
+         Tablet: 338px fijo; Desktop: 384px fijo (Figma), sin radio propio (lo da la card). -->
+    <div
+      class="relative flex h-[93px] items-center justify-center overflow-hidden rounded-t-[24px] bg-hero-surface text-hero-text md:block md:h-auto md:w-[338px] md:shrink-0 md:rounded-none lg:w-[384px]"
+    >
+      <!-- Título: centrado horizontalmente (Figma left-[calc(50%-158px)]); 24px en el banner mobile,
+           32px centrado al ~33% de la altura desde md -->
+      <div class="px-[30px] text-center md:absolute md:inset-x-0 md:top-1/3 md:-translate-y-1/2 md:px-0">
+        <h1 class="whitespace-nowrap text-[24px] font-bold leading-[35px] md:text-[32px]">Conoce a tu cliente</h1>
+      </div>
+      <!-- Imagen: oculta en mobile (Figma); desde md a sangre con base al ~84% (deja ~16% lavanda debajo) -->
+      <img
+        [src]="heroImageUrl()"
+        class="hidden w-full self-end object-contain md:absolute md:inset-x-0 md:bottom-[16%] md:block"
+        alt=""
+        (error)="hideBrokenImage($event)"
+      />
+    </div>
+
+    <!-- Contenido del paso (formulario o confirmación): lo aporta el contenedor. -->
+    <ng-content />
+  </div>
+</section>

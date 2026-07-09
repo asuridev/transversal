@@ -1,0 +1,65 @@
+<div class="mx-auto flex max-w-md flex-col gap-6 md:max-w-lg">
+  <div class="flex flex-col gap-2">
+    <a
+      routerLink="/admin"
+      class="inline-flex w-fit items-center gap-1 text-sm text-admin-link hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 rounded"
+    >
+      <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Volver a Partners
+    </a>
+    <div>
+      <h1 class="text-2xl font-bold">Nuevo partner</h1>
+      <p class="text-sm text-admin-text-muted">Registra un partner nuevo con su slug, partner key y nombre visible.</p>
+    </div>
+  </div>
+
+  <ui-card class="p-6 md:p-8">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-admin-primary" for="slug">Slug <span aria-hidden="true">*</span></label>
+        <ui-text-input id="slug" formControlName="slug" placeholder="banco-popular" />
+        @if (form.controls.slug.touched && form.controls.slug.hasError('required')) {
+          <ui-field-message>El slug es requerido.</ui-field-message>
+        }
+        @if (form.controls.slug.touched && form.controls.slug.hasError('format')) {
+          <ui-field-message>Formato inválido: solo minúsculas, números y guiones.</ui-field-message>
+        }
+        @if (form.controls.slug.touched && form.controls.slug.hasError('reserved')) {
+          <ui-field-message>Ese slug está reservado por la plataforma.</ui-field-message>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-admin-primary" for="partnerKey">Partner key <span aria-hidden="true">*</span></label>
+        <ui-text-input id="partnerKey" formControlName="partnerKey" placeholder="2efd0584-d38a-4a2f-9dd8-42f2905c3aae" />
+        @if (form.controls.partnerKey.touched && form.controls.partnerKey.hasError('required')) {
+          <ui-field-message>El partner key es requerido.</ui-field-message>
+        }
+        @if (form.controls.partnerKey.touched && form.controls.partnerKey.hasError('format')) {
+          <ui-field-message>Formato inválido: debe ser un UUID (ej. 2efd0584-d38a-4a2f-9dd8-42f2905c3aae).</ui-field-message>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-admin-primary" for="displayName">Nombre visible <span aria-hidden="true">*</span></label>
+        <ui-text-input id="displayName" formControlName="displayName" placeholder="Banco Popular" />
+        @if (form.controls.displayName.touched && form.controls.displayName.hasError('required')) {
+          <ui-field-message>El nombre es requerido.</ui-field-message>
+        }
+      </div>
+
+      @if (serverError()) {
+        <ui-field-message>{{ serverError() }}</ui-field-message>
+      }
+
+      <div class="flex gap-3 pt-2">
+        <ui-button type="submit" [disabled]="createMutation.isPending()">
+          {{ createMutation.isPending() ? 'Creando…' : 'Crear partner' }}
+        </ui-button>
+        <ui-link-button variant="admin-secondary" routerLink="/admin">Cancelar</ui-link-button>
+      </div>
+    </form>
+  </ui-card>
+</div>

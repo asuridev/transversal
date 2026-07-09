@@ -1,0 +1,54 @@
+/* Poppins — fuente de marca de los partners (p. ej. Banco de Occidente, Figma).
+   El token --brand-font-family la referencia; sin cargarla caía a system-ui. */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--brand-primary);
+  --color-primary-tint: var(--brand-primary-tint);
+  --color-secondary: var(--brand-secondary);
+  --color-secondary-tint: var(--brand-secondary-tint);
+  --color-text-strong: var(--brand-text-strong);
+  --color-text-muted: var(--brand-text-muted);
+  --color-surface: var(--brand-surface);
+  --color-border: var(--brand-border);
+  --color-hero-surface: var(--brand-hero-surface);
+  --color-hero-text: var(--brand-hero-text);
+  --color-footer-surface: var(--brand-footer-surface);
+  --color-footer-text: var(--brand-footer-text);
+  --font-brand: var(--brand-font-family), system-ui, sans-serif;
+
+  /* Chrome neutro del Back Office (BNP Paribas Cardif, contracts/admin-design-language.contract.md).
+     Independiente de --brand-*: nunca se aplica dentro del theme-preview (SC-009). */
+  --color-admin-primary: #00965e;
+  --color-admin-accent: #93bd0e;
+  --color-admin-link: #00a2b5;
+  --color-admin-text-strong: #333333;
+  --color-admin-text-muted: #575451;
+  --color-admin-text-soft: #aba9a8;
+  --color-admin-placeholder: #bfbfbf;
+  --color-admin-surface: #ffffff;
+  --color-admin-surface-2: #fdfdfd;
+  --color-admin-bg: #f5f5f5;
+  --color-admin-bg-2: #f3f3f3;
+  --color-admin-border: #dadada;
+  --font-admin: "BNPP Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Neutros de arranque para --brand-* (evitan variable sin valor antes de aplicar
+   el theme; en SSR el resolver los sobre-escribe inline con la marca real). */
+:root {
+  --brand-primary: #1f2937;
+  --brand-primary-tint: #e5e7eb;
+  --brand-secondary: #4b5563;
+  --brand-secondary-tint: #f3f4f6;
+  --brand-text-strong: #111827;
+  --brand-text-muted: #6b7280;
+  --brand-surface: #ffffff;
+  --brand-border: #d1d5db;
+  --brand-hero-surface: #f3f4f6;
+  --brand-hero-text: #111827;
+  --brand-footer-surface: #ffffff;
+  --brand-footer-text: #6b7280;
+  --brand-font-family: "Poppins";
+}

@@ -1,0 +1,15 @@
+# Sidecar de durabilidad (FR-023, SC-008). No es código de la app: es config de
+# despliegue para el binario `litestream` que corre junto al proceso del servidor.
+#
+# Arranque (antes de servir tráfico):
+#   litestream restore -if-replica-exists /data/partners.db
+# Ejecución (durante toda la vida del proceso):
+#   litestream replicate -config litestream.yml
+#
+# Ver specs/002-modelo-partner-theme/quickstart.md → "Escenario 6" para el
+# procedimiento completo de validación de restore.
+dbs:
+  - path: /data/partners.db
+    replicas:
+      - url: s3://<bucket>/partners
+        sync-interval: 1s # RPO objetivo ~segundos (FR-023, SC-008)

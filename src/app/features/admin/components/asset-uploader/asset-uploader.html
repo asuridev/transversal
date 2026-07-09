@@ -1,0 +1,75 @@
+<div class="flex flex-col gap-2">
+  <div class="flex items-center gap-3">
+    <div
+      class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[4px] border border-admin-border bg-admin-bg"
+    >
+      @if (previewSrc() && !brokenImage()) {
+        <img
+          [src]="previewSrc()"
+          alt="Vista previa del asset"
+          class="h-full w-full object-contain"
+          (error)="brokenImage.set(true)"
+          (load)="brokenImage.set(false)"
+        />
+      } @else {
+        <svg viewBox="0 0 24 24" fill="none" class="h-7 w-7 text-admin-text-muted/50" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6" />
+          <circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4" />
+          <path d="m4 17 5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      }
+    </div>
+
+    <div class="flex flex-1 flex-col gap-1.5">
+      <div class="flex items-center gap-2">
+        @switch (state()) {
+          @case ('uploading') { <ui-badge variant="info">Subiendo…</ui-badge> }
+          @case ('unsaved') { <ui-badge variant="warning">Nueva — sin guardar</ui-badge> }
+          @case ('saved') { <ui-badge variant="active">Actual</ui-badge> }
+          @default { <ui-badge variant="inactive">Sin imagen</ui-badge> }
+        }
+        @if (fileName()) {
+          <span class="truncate text-xs text-admin-text-muted">{{ fileName() }}{{ fileMeta() }}</span>
+        }
+      </div>
+
+      <label
+        class="flex cursor-pointer items-center justify-center gap-2 rounded-[3px] border border-dashed border-admin-border px-3 py-2 text-center text-sm text-admin-text-muted transition-colors hover:border-admin-primary hover:text-admin-primary focus-within:ring-2 focus-within:ring-admin-primary focus-within:ring-offset-2"
+        [class.opacity-50]="disabled() || uploading()"
+      >
+        @if (uploading()) {
+          <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4 shrink-0 animate-spin" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-opacity="0.25" />
+            <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4 shrink-0" aria-hidden="true">
+            <path d="M12 16V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        }
+        {{ uploading() ? 'Subiendo…' : value() ? 'Reemplazar archivo' : 'Subir archivo' }}
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/svg+xml,image/x-icon,image/webp"
+          class="sr-only"
+          [disabled]="disabled() || uploading()"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+    </div>
+  </div>
+
+  @if (state() === 'unsaved') {
+    <ui-field-message variant="success">Imagen cargada. Recuerda Guardar y Publicar para aplicarla.</ui-field-message>
+  }
+  @if (brokenImage()) {
+    <ui-field-message variant="warning">No se pudo cargar la vista previa de la imagen ({{ value() }}).</ui-field-message>
+  }
+  @if (clientError()) {
+    <ui-field-message>{{ clientError() }}</ui-field-message>
+  }
+  @if (uploadError()) {
+    <ui-field-message>No se pudo subir el archivo. Intenta de nuevo.</ui-field-message>
+  }
+</div>
