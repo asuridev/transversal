@@ -25,7 +25,6 @@ export const AuthStore = signalStore(
     isAuthenticated: computed(() => user() !== null),
     partnerId: computed(() => user()?.partnerId ?? null),
     partnerSlug: computed(() => user()?.partnerSlug ?? null),
-    partnerKey: computed(() => user()?.partnerKey ?? null),
     isAsesor: computed(() => user()?.partnerSlug !== undefined),
   })),
   withMethods((store) => ({

@@ -2,15 +2,16 @@ import { isPlatformBrowser } from '@angular/common';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
 
-import { AuthStore } from '../auth/auth.store';
 import { SalesFlowStore } from '../store/sales-flow.store';
 
 /**
- * Estampa en las peticiones del journey (`/api/journey/*`) los dos datos que el
- * BFF reenvía a las APIs externas: `X-Correlation-Id` (el id del flujo de venta
- * del asesor, mantenido por `SalesFlowStore`) para trazar el consumo de punta a
- * punta, y `_p` (el `partnerKey` del asesor, `AuthStore`) que Cardif exige como
- * identificador del partner. El BFF los reenvía como `correlation-id` y `_p`.
+ * Estampa en las peticiones del journey (`/api/journey/*`) el `X-Correlation-Id`
+ * (el id del flujo de venta del asesor, mantenido por `SalesFlowStore`) para
+ * trazar el consumo de punta a punta. El BFF lo reenvía como `correlation-id`.
+ *
+ * El `partnerKey` (`_p`) que Cardif exige NO viaja desde el cliente: el BFF lo
+ * deriva de la sesión sellada (`requirePartnerScope`), de modo que el secreto
+ * nunca sale del servidor.
  */
 export const correlationInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.includes('/api/journey/')) {
@@ -24,15 +25,6 @@ export const correlationInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const correlationId = inject(SalesFlowStore).correlationId();
-  const partnerKey = inject(AuthStore).partnerKey();
 
-  const setHeaders: Record<string, string> = {};
-  if (correlationId) {
-    setHeaders['X-Correlation-Id'] = correlationId;
-  }
-  if (partnerKey) {
-    setHeaders['_p'] = partnerKey;
-  }
-
-  return Object.keys(setHeaders).length > 0 ? next(req.clone({ setHeaders })) : next(req);
+  return correlationId ? next(req.clone({ setHeaders: { 'X-Correlation-Id': correlationId } })) : next(req);
 };

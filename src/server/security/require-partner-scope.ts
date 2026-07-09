@@ -10,6 +10,8 @@ import { logRequestError } from '../observability/request-log.ts';
 export interface RequestPartnerScope {
   readonly id: string;
   readonly slug: string;
+  /** UUID del partner para consumir servicios externos (Cardif `_p`). Derivado de la sesión, nunca del cliente. */
+  readonly partnerKey: string;
   readonly actorSub: string;
   readonly actorName: string;
 }
@@ -58,10 +60,11 @@ export function requirePartnerScope(deps: PartnerScopeDeps): RequestHandler {
       return;
     }
 
-    if (!session.partnerSlug || !session.partnerId) {
+    if (!session.partnerSlug || !session.partnerId || !session.partnerKey) {
       // Sesión sin partner (admin de Back Office u otra identidad sin vínculo
-      // válido, FR-008): no puede operar el journey del asesor. `not_found`
-      // para no revelar nada sobre el slug solicitado.
+      // válido, FR-008), o de asesor sin `partnerKey` (sesión no operable):
+      // no puede operar el journey del asesor. `not_found` para no revelar
+      // nada sobre el slug solicitado.
       const apiError = createApiError('not_found', 'Recurso no encontrado', req.requestId);
       res.status(httpStatusForCode('not_found')).json(apiError);
       return;
@@ -110,6 +113,7 @@ export function requirePartnerScope(deps: PartnerScopeDeps): RequestHandler {
     req.partner = {
       id: session.partnerId,
       slug: session.partnerSlug,
+      partnerKey: session.partnerKey,
       actorSub: session.sub,
       actorName: session.name,
     };

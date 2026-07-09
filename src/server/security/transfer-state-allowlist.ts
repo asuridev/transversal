@@ -15,7 +15,9 @@ const REQUIRED_PUBLIC_THEME_KEYS: ReadonlySet<string> = new Set([
 // Forma de `AuthUser` (auth-model.ts): subject/name/roles requeridos;
 // partnerId/partnerSlug opcionales. Ningún otro campo puede cruzar (007).
 const REQUIRED_SESSION_KEYS: ReadonlySet<string> = new Set(['subject', 'name', 'roles']);
-const OPTIONAL_SESSION_KEYS: ReadonlySet<string> = new Set(['partnerId', 'partnerSlug', 'partnerKey']);
+// `partnerKey` NO puede cruzar al cliente: es un secreto que el BFF resuelve de
+// la sesión sellada (007/009). Si alguien intenta colarlo, el allowlist lo rechaza.
+const OPTIONAL_SESSION_KEYS: ReadonlySet<string> = new Set(['partnerId', 'partnerSlug']);
 
 function assertObject(key: string, value: unknown, label: string): asserts value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {

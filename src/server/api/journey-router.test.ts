@@ -25,7 +25,18 @@ function fakeSecretResolver(creds: Record<string, IntegrationCreds | null>): Sec
 
 function sessionCookie(overrides: Partial<SealedSession> = {}): string {
   const iat = Math.floor(Date.now() / 1000);
-  return seal.seal({ sub: 'u-asesor-a', name: 'Asesor A', roles: [], iat, exp: iat + 3600, ...overrides });
+  // `partnerKey` por defecto: las sesiones de asesor lo llevan sellado (009); el
+  // BFF lo deriva de aquí, ya no del header `_p` del cliente. Las sesiones admin
+  // (sin partnerId/slug) igual son rechazadas por `requirePartnerScope`.
+  return seal.seal({
+    sub: 'u-asesor-a',
+    name: 'Asesor A',
+    roles: [],
+    partnerKey: 'partner-key-a',
+    iat,
+    exp: iat + 3600,
+    ...overrides,
+  });
 }
 
 function baseDeps(overrides: Partial<JourneyRouterDeps> = {}): JourneyRouterDeps {
@@ -245,7 +256,7 @@ function stubCardifChain(options: { authorizationCustomerToken?: string | null }
 }
 
 test('journey-router: contact-info (KYC, cadena real Cardif)', async (t) => {
-  await t.test('body válido + _p + correlation-id ⇒ orquesta pasos 2/3/1 y devuelve el body de Cardif', async () => {
+  await t.test('body válido + correlation-id ⇒ deriva partnerKey de la sesión, orquesta pasos 2/3/1 y devuelve el body de Cardif', async () => {
     const originalFetch = globalThis.fetch;
     const { impl, calls } = stubCardifChain();
     globalThis.fetch = impl;
@@ -257,7 +268,6 @@ test('journey-router: contact-info (KYC, cadena real Cardif)', async (t) => {
           headers: {
             'content-type': 'application/json',
             cookie: `bo_session=${cookie}`,
-            _p: 'partner-key-a',
             'x-correlation-id': 'corr-123',
           },
           body: JSON.stringify({ documentType: 'CC', documentNumber: '10282664' }),
@@ -292,17 +302,17 @@ test('journey-router: contact-info (KYC, cadena real Cardif)', async (t) => {
     assert.equal(calls[2].headers['correlation-id'], 'corr-123');
   });
 
-  await t.test('sin header _p ⇒ 400 invalid_input', async () => {
+  await t.test('sesión de asesor sin partnerKey ⇒ 404 (sesión no operable)', async () => {
     await withServer(baseDeps(), async (baseUrl) => {
-      const cookie = sessionCookie({ partnerId: 'p-a', partnerSlug: 'banco-a' });
+      const cookie = sessionCookie({ partnerId: 'p-a', partnerSlug: 'banco-a', partnerKey: undefined });
       const res = await fetch(`${baseUrl}/journey/banco-a/contact-info`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie: `bo_session=${cookie}` },
         body: JSON.stringify({ documentType: 'CC', documentNumber: '10282664' }),
       });
-      assert.equal(res.status, 400);
+      assert.equal(res.status, 404);
       const body = (await res.json()) as { code: string };
-      assert.equal(body.code, 'invalid_input');
+      assert.equal(body.code, 'not_found');
     });
   });
 
@@ -318,7 +328,6 @@ test('journey-router: contact-info (KYC, cadena real Cardif)', async (t) => {
           headers: {
             'content-type': 'application/json',
             cookie: `bo_session=${cookie}`,
-            _p: 'partner-key-a',
             'x-correlation-id': 'corr-123',
           },
           body: JSON.stringify({ documentType: 'CC', documentNumber: '10282664' }),

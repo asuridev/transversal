@@ -37,8 +37,9 @@ export function createJourneyRouter(deps: JourneyRouterDeps): Router {
    * genérico; el partner de la **sesión** (`req.partner`) es autoritativo para
    * el aislamiento. Orquesta la cadena real de Cardif: pasos 2 y 3
    * (`acquireApiTokens`) para obtener `paramj` + el token `AuthorizationCustomer`,
-   * y paso 1 (`fetchContactInfo`) para la consulta. `_p` y `correlation-id`
-   * llegan como headers del cliente y se reenvían a Cardif.
+   * y paso 1 (`fetchContactInfo`) para la consulta. El `partnerKey` (`_p`) se
+   * deriva de la sesión sellada (`req.partner`, nunca del cliente); el
+   * `correlation-id` llega como header del cliente. Ambos se reenvían a Cardif.
    */
   router.post('/:slug/contact-info', requirePartnerScope(deps), async (req: Request, res: Response) => {
     try {
@@ -60,13 +61,9 @@ export function createJourneyRouter(deps: JourneyRouterDeps): Router {
         return;
       }
 
-      const partnerKeyHeader = req.headers['_p'];
-      const partnerKey = Array.isArray(partnerKeyHeader) ? partnerKeyHeader[0] : partnerKeyHeader;
-      if (typeof partnerKey !== 'string' || partnerKey.length === 0) {
-        const apiError = createApiError('invalid_input', 'Header _p (partnerKey) requerido', req.requestId, { field: '_p' });
-        res.status(httpStatusForCode('invalid_input')).json(apiError);
-        return;
-      }
+      // `partnerKey` autoritativo de la sesión (007, D4) — nunca del cliente.
+      // `requirePartnerScope` ya garantizó su presencia.
+      const partnerKey = req.partner!.partnerKey;
 
       const correlationHeader = req.headers['x-correlation-id'];
       const correlationId = String(

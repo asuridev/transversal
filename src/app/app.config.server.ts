@@ -66,7 +66,6 @@ const serverConfig: ApplicationConfig = {
               roles: sealed.roles,
               ...(sealed.partnerId !== undefined ? { partnerId: sealed.partnerId } : {}),
               ...(sealed.partnerSlug !== undefined ? { partnerSlug: sealed.partnerSlug } : {}),
-              ...(sealed.partnerKey !== undefined ? { partnerKey: sealed.partnerKey } : {}),
             };
             authStore.setUser(user);
             writeSessionTransferState(transferState, user);

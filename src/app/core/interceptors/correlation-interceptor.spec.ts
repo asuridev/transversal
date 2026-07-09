@@ -38,6 +38,14 @@ describe('correlationInterceptor', () => {
     req.flush({});
   });
 
+  it('nunca estampa el header _p (el partnerKey lo resuelve el BFF, no el cliente)', () => {
+    store.start();
+    http.post('/api/journey/banco-a/consultar', {}).subscribe();
+    const req = httpMock.expectOne('/api/journey/banco-a/consultar');
+    expect(req.request.headers.has('_p')).toBe(false);
+    req.flush({});
+  });
+
   it('no añade el header si no hay flujo activo (correlationId null)', () => {
     http.post('/api/journey/banco-a/consultar', {}).subscribe();
     const req = httpMock.expectOne('/api/journey/banco-a/consultar');

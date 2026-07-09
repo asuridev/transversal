@@ -40,8 +40,20 @@ test('transfer-state-allowlist', async (t) => {
     );
   });
 
-  await t.test('P6: acepta "session" con partnerId/partnerSlug/partnerKey (asesor)', () => {
+  await t.test('P6: acepta "session" con partnerId/partnerSlug (asesor)', () => {
     assert.doesNotThrow(() =>
+      assertAllowedTransferStateWrite('session', {
+        subject: 'u-a',
+        name: 'Asesor A',
+        roles: [],
+        partnerId: 'p-a',
+        partnerSlug: 'banco-a',
+      }),
+    );
+  });
+
+  await t.test('P6b: rechaza "session" con partnerKey (secreto que no puede cruzar al cliente)', () => {
+    assert.throws(() =>
       assertAllowedTransferStateWrite('session', {
         subject: 'u-a',
         name: 'Asesor A',

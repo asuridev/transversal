@@ -12,7 +12,17 @@ const seal = createSessionSeal({ key });
 
 function sessionCookie(overrides: Partial<SealedSession> = {}): string {
   const iat = Math.floor(Date.now() / 1000);
-  return seal.seal({ sub: 'u-asesor-a', name: 'Asesor A', roles: [], iat, exp: iat + 3600, ...overrides });
+  // Las sesiones de asesor llevan `partnerKey` sellado (009); el admin (P2, sin
+  // partnerId/slug) es rechazado antes de mirarlo.
+  return seal.seal({
+    sub: 'u-asesor-a',
+    name: 'Asesor A',
+    roles: [],
+    partnerKey: 'partner-key-a',
+    iat,
+    exp: iat + 3600,
+    ...overrides,
+  });
 }
 
 function baseDeps(overrides: Partial<PartnerScopeDeps> = {}): PartnerScopeDeps {
@@ -72,9 +82,18 @@ test('requirePartnerScope', async (t) => {
       assert.deepEqual(body.partner, {
         id: 'p-a',
         slug: 'banco-a',
+        partnerKey: 'partner-key-a',
         actorSub: 'u-asesor-a',
         actorName: 'Asesor A',
       });
+    });
+  });
+
+  await t.test('P3b: asesor con partnerId/slug pero sin partnerKey ⇒ 404 (sesión no operable)', async () => {
+    await withServer(baseDeps(), async (baseUrl) => {
+      const cookie = sessionCookie({ partnerId: 'p-a', partnerSlug: 'banco-a', partnerKey: undefined });
+      const res = await fetch(`${baseUrl}/banco-a/action`, { headers: { cookie: `bo_session=${cookie}` } });
+      assert.equal(res.status, 404);
     });
   });
 
