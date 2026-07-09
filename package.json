@@ -12,7 +12,7 @@
     "serve:ssr:transversal": "node dist/transversal/server/server.mjs",
     "serve:ssr": "node dist/transversal/server/server.mjs",
     "start:full": "npm run build && node --env-file=.env dist/transversal/server/server.mjs",
-    "start:dev":  "npm run build && node --env-file=.env.dev dist/transversal/server/server.mjs"
+    "start:dev":  "npm run build && node --use-system-ca --env-file=.env.dev dist/transversal/server/server.mjs"
 
   },
   "prettier": {
